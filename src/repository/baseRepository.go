@@ -3,6 +3,7 @@ package repository
 import (
 	"example.com/hello/src/models"
 	"github.com/jmoiron/sqlx"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Authorization interface {
@@ -10,12 +11,18 @@ type Authorization interface {
 	GetUserFromDb(login string, password string) (models.LoginUserStruct, error)
 }
 
-type Repository struct {
-	Authorization
+type RabbitTransport interface {
+	PushPackage(data string) (bool, error)
 }
 
-func NewRepository(db *sqlx.DB) *Repository {
+type Repository struct {
+	Authorization
+	RabbitTransport
+}
+
+func NewRepository(db *sqlx.DB, redisConn *amqp.Channel) *Repository {
 	return &Repository{
-		Authorization: NewAuthPostgres(db),
+		Authorization:   NewAuthPostgres(db),
+		RabbitTransport: NewRabbitTransport(redisConn),
 	}
 }

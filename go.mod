@@ -9,6 +9,7 @@ require (
 
 require (
 	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.3.4 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 )
 

@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"example.com/hello/src/models"
@@ -17,7 +18,8 @@ const (
 )
 
 type AuthService struct {
-	repo repository.Authorization
+	repo            repository.Authorization
+	rabbitTransport repository.RabbitTransport
 }
 
 type TokenClaims struct {
@@ -25,9 +27,10 @@ type TokenClaims struct {
 	UserId int `json:"user_id"`
 }
 
-func NewAuthService(repo repository.Authorization) *AuthService {
+func NewAuthService(repo *repository.Repository) *AuthService {
 	return &AuthService{
-		repo: repo,
+		repo:            repo.Authorization,
+		rabbitTransport: repo.RabbitTransport,
 	}
 }
 
@@ -72,7 +75,19 @@ func (as *AuthService) LoginUser(user models.LoginUserStruct) (string, error) {
 		}, dbUser.Id,
 	})
 
-	return token.SignedString([]byte(sign))
+	tokenByte, error := token.SignedString([]byte(sign))
+
+	if error != nil {
+		log.Printf("token creation failed")
+	}
+
+	_, error = as.rabbitTransport.PushPackage(tokenByte)
+
+	if error != nil {
+		log.Printf("token sending failed")
+	}
+
+	return tokenByte, error
 }
 
 func generatePasswordHash(password string) string {

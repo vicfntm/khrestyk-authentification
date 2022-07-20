@@ -34,7 +34,18 @@ func main() {
 		log.Fatalf("db connection lost %s", err.Error())
 	}
 
-	repos := repository.NewRepository(conn)
+	rabbitConn, err := repository.RabbitConnect(repository.RabbitConfig{
+		Login:    os.Getenv("RABBITMQ_DEFAULT_USER"),
+		Password: os.Getenv("RABBITMQ_DEFAULT_PASS"),
+		Port:     os.Getenv("RABBIT_PORT"),
+		Host:     os.Getenv("RABBIT_HOST"),
+		VHost:    os.Getenv("RABBIT_VHOST"),
+	})
+
+	if err != nil {
+		log.Fatalf("redis connection lost %s", err.Error())
+	}
+	repos := repository.NewRepository(conn, rabbitConn)
 	services := services.NewService(repos)
 	server := new(server.Server)
 	handlers := handlers.NewHandler(services)

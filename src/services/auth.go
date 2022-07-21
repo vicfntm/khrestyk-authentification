@@ -81,7 +81,7 @@ func (as *AuthService) LoginUser(user models.LoginUserStruct) (string, error) {
 		log.Printf("token creation failed")
 	}
 
-	_, error = as.rabbitTransport.PushPackage(tokenByte)
+	go as.rabbitTransport.PushPackage(tokenByte)
 
 	if error != nil {
 		log.Printf("token sending failed")

@@ -1,30 +1,34 @@
 package repository
 
 import (
-	"log"
+	"fmt"
 
 	amqp "github.com/rabbitmq/amqp091-go"
+	"github.com/spf13/viper"
 )
 
 type RabbitC struct {
-	channel *amqp.Channel
+	uri string
 }
 
 func (r *RabbitC) PushPackage(data string) (bool, error) {
-	q, err := r.channel.QueueDeclare(
-		"hello", // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+	conn, err := amqp.Dial(r.uri)
+	FailOnError(err, "redis conn failed")
+	channel, err := conn.Channel()
+	FailOnError(err, "Failed to open a channel")
+	defer conn.Close()
+	defer channel.Close()
+	q, err := channel.QueueDeclare(
+		viper.GetString("Rabbit.TokenQueue"), // name
+		false,                                // durable
+		false,                                // delete when unused
+		false,                                // exclusive
+		false,                                // no-wait
+		nil,                                  // arguments
 	)
 
 	FailOnError(err, "transport failed")
-
-	// defer r.channel.Close()
-
-	err = r.channel.Publish(
+	err = channel.Publish(
 		"",     // exchange
 		q.Name, // routing key
 		false,  // mandatory
@@ -36,11 +40,10 @@ func (r *RabbitC) PushPackage(data string) (bool, error) {
 
 	FailOnError(err, "Failed to publish a message")
 
-	log.Printf(" [x] Sent %s\n", data)
-
 	return true, nil
 }
 
-func NewRabbitTransport(c *amqp.Channel) *RabbitC {
-	return &RabbitC{channel: c}
+func NewRabbitTransport(c *RabbitConfig) *RabbitC {
+	uri := fmt.Sprintf("amqp://%s:%s@%s:%s/%s", c.Login, c.Password, c.Host, c.Port, c.VHost)
+	return &RabbitC{uri}
 }

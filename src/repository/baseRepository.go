@@ -3,7 +3,6 @@ package repository
 import (
 	"example.com/hello/src/models"
 	"github.com/jmoiron/sqlx"
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Authorization interface {
@@ -20,9 +19,9 @@ type Repository struct {
 	RabbitTransport
 }
 
-func NewRepository(db *sqlx.DB, redisConn *amqp.Channel) *Repository {
+func NewRepository(db *sqlx.DB, rc *RabbitConfig) *Repository {
 	return &Repository{
 		Authorization:   NewAuthPostgres(db),
-		RabbitTransport: NewRabbitTransport(redisConn),
+		RabbitTransport: NewRabbitTransport(rc),
 	}
 }

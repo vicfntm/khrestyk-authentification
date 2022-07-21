@@ -5,3 +5,5 @@ DB:
   SslMode: disable
   Port: 5499 
   DbName: postgres
+Rabbit:
+  TokenQueue: tokens

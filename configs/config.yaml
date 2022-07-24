@@ -1,6 +1,5 @@
 SERVER_PORT: 9099
 DB:
-  Host: localhost
   Username: postgres
   SslMode: disable
   Port: 5499 

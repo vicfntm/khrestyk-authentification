@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/jmoiron/sqlx"
 
@@ -22,7 +23,7 @@ type Config struct {
 }
 
 func NewPsql(conf Config) (*sqlx.DB, error) {
-	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", conf.Host, conf.Port, conf.Username, conf.DBName, conf.Password, conf.SSLMode))
+	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", os.Getenv("DB_HOST"), conf.Port, conf.Username, conf.DBName, conf.Password, conf.SSLMode))
 	if err != nil {
 		return nil, err
 	}

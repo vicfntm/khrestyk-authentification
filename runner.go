@@ -22,11 +22,11 @@ func main() {
 		log.Fatalf("env file loading failed: %s", err.Error())
 	}
 	conn, err := repository.NewPsql(repository.Config{
-		Host:     viper.GetString("DB.Host"),
-		Port:     viper.GetString("DB.Port"),
-		Username: viper.GetString("DB.Username"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Username: os.Getenv("DB_USERNAME"),
 		Password: os.Getenv("DB_PASSWORD"),
-		DBName:   viper.GetString("DB.DbName"),
+		DBName:   os.Getenv("DB_NAME"),
 		SSLMode:  viper.GetString("DB.SslMode"),
 	})
 

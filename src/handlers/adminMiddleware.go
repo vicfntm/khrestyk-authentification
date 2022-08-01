@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 
@@ -14,7 +13,6 @@ const MESSAGE = "NOT ALLOWED"
 func (h *Handler) IsAdmin(c *gin.Context) {
 
 	token := c.Query("adminToken")
-	fmt.Printf("token: %s", os.Getenv("ADMIN_TOKEN"))
 	if token != os.Getenv("ADMIN_TOKEN") {
 		exceptionhandlers.NewErrorResponse(c, http.StatusForbidden, MESSAGE)
 	}

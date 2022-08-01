@@ -12,7 +12,7 @@ type Handler struct {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	auth := router.Group("/auth")
+	auth := router.Group("/jwt-policy")
 	{
 		auth.POST("/sign-up", h.IsAdmin, h.signUp)
 		auth.POST("/sign-in", h.signIn)

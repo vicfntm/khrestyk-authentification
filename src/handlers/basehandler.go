@@ -15,7 +15,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	auth := router.Group("/jwt-policy")
 	{
 		auth.POST("/sign-up", h.IsAdmin, h.signUp)
-		auth.POST("/sign-in", h.signIn)
+		auth.POST("/sign-in", h.CORSMiddleware, h.signIn)
 
 	}
 

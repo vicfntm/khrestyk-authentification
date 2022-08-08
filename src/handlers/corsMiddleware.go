@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	// "net/http"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,10 +13,10 @@ func (h *Handler) CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
-		// if c.Request.Method == "OPTIONS" {
-		// 	c.AbortWithStatus(http.StatusNoContent)
-		// 	return
-		// }
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
 
 		c.Next()
 	}

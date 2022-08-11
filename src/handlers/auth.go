@@ -36,13 +36,14 @@ func (h *Handler) signIn(c *gin.Context) {
 		exceptionhandlers.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
-	token, err := h.services.Authorization.LoginUser(input)
+	token, expAt, err := h.services.Authorization.LoginUser(input)
 
 	if err != nil {
 		exceptionhandlers.NewErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+		"token":   token,
+		"expired": expAt,
 	})
 }

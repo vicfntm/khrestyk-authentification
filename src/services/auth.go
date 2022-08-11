@@ -61,16 +61,16 @@ func (as *AuthService) CreateUser(user models.User) (int, error) {
 	return as.repo.CreateUser(user)
 }
 
-func (as *AuthService) LoginUser(user models.LoginUserStruct) (string, error) {
+func (as *AuthService) LoginUser(user models.LoginUserStruct) (string, int64, error) {
 	dbUser, error := as.repo.GetUserFromDb(user.Username, generatePasswordHash(user.Password))
 
 	if error != nil {
-		return "", error
+		return "", int64(0), error
 	}
-
+	expAt := time.Now().Add(12 * time.Hour).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &TokenClaims{
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(12 * time.Hour).Unix(),
+			ExpiresAt: expAt,
 			IssuedAt:  time.Now().Unix(),
 		}, dbUser.Id,
 	})
@@ -87,7 +87,7 @@ func (as *AuthService) LoginUser(user models.LoginUserStruct) (string, error) {
 		log.Printf("token sending failed")
 	}
 
-	return tokenByte, error
+	return tokenByte, expAt, error
 }
 
 func generatePasswordHash(password string) string {
